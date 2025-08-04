@@ -1,0 +1,41 @@
+# Ignore the local Maven build directory. The container will create its own.
+# This is the single most important rule for preventing stale builds.
+target/
+
+# ignore local work files
+work/
+
+# Ignore the .git directory and the .gitignore file itself.
+.git
+.gitignore
+
+# Ignore the .dockerignore file itself.
+.dockerignore
+
+# Ignore IDE-specific configuration folders.
+.idea/
+.vscode/
+.settings/
+
+# Ignore local build and log files.
+*.log
+*.jar
+
+# Ignore Docker and deployment files that are not needed inside the image.
+Dockerfile
+docker-compose.yml
+deploy.sh
+terraform/
+
+# Ignore OS-specific files
+.DS_Store
+._*
+
+# Ignore Maven wrapper files that are not needed if the base image has Maven.
+# (Keeping them is also fine, but for a minimal context, they can be excluded).
+.mvn/
+mvnw
+mvnw.cmd
+
+# Ignore README and other documentation.
+README.md

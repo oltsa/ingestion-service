@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -62,10 +61,7 @@ public class EmailIngestionService {
                 metricsRepository.incrementMessagesProcessed();
 
                 try {
-                    byte[] content = tis.readNBytes((int) tarEntry.getSize());
-                    InputStream entryStream = new ByteArrayInputStream(content);
-                    
-                    EmailParser.extractSender(entryStream).ifPresent(
+                    EmailParser.extractSender(tis).ifPresent(
                         sender -> metricsRepository.incrementValidSenderMessages(sender)
                     );
                 } catch (jakarta.mail.MessagingException e) {

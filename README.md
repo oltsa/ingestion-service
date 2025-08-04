@@ -12,12 +12,11 @@ The service provides the following HTTP endpoints as required by the prompt:
 
 ## Design Philosophy & Justification
 
-The architecture of this service is a direct and deliberate response to the requirements of the coding exercise. Key trade-offs were made to deliver a system that is simple, self-contained, and runnable locally, while still being designed for a cloud environment. Explanation of truly "cloud-native" at the end of README
+The architecture of this service matches requirements of the coding exercise. Trade-offs were made to deliver a system that is simple, self-contained, and runnable locally, while still being designed for a cloud environment. Explanation of "cloud-native" approach at the end of README
 
-1.  **Request-Driven Ingestion (`POST /start`)**: The prompt explicitly asks for a `POST /start` endpoint, implying a request-driven model where a client actively initiates the process. My design implements this contract precisely, streaming the uploaded file to ensure a low memory footprint.
+1.  **Request-Driven Ingestion (`POST /start`)**: The prompt explicitly asks for a `POST /start` endpoint, implying a request-driven model where a client actively initiates the process. The design implements this contract precisely. The archive is sent to the end point and streamed for a low memory footprint.
 
-2.  **In-Memory State**: To keep the application simple and self-contained, the ingestion status and sender counts are managed in-memory. This is an acceptable trade-off for the on-demand analysis use case described, but its limitations are recognized.
-    *   **Extensibility:** The state management is abstracted behind a `MetricsRepository` interface, which is the key enabler for the more advanced architecture discussed below.
+2.  **In-Memory State**: To keep the application simple and self-contained, the ingestion status and sender counts are managed in-memory. This causes limitations for how large datasets can be consumed before memory becomes and issue.
 
 ## Excersize Technology Stack
 
@@ -79,11 +78,10 @@ The true "cloud-native" solution separates the responsibilities of ingestion, st
 *   **The "Write Path" (High-Throughput Data Ingestion):**
     The process would no longer be a single, long-running job. The service's responsibility would change fundamentally:
     1.  A **Cloud Run** job is triggered by a file upload to **GCS**, receiving an event from **Pub/Sub**.
-    2.  Its *only* job is to parse the file and stream the raw, un-aggregated data—one record per valid email—into a high-throughput ingestion service. The right tool for this is **Google BigQuery's Streaming API**. This is not a database update; it's a fire-and-forget append operation designed for massive scale. Redis would not be used here, as it is not an optimal tool for ingesting raw event streams.
+    2.  Its *only* job is to parse the file and stream the raw, un-aggregated data—one record per valid email—into a high-throughput ingestion service. **Google BigQuery's Streaming API** can be used. 
 
 *   **The "Read Path" (On-Demand Analytics):**
     With raw data flowing into BigQuery, the `GET /top-senders` endpoint would be part of a **separate "Metrics API" service**. Its job is to execute a simple SQL query against for e.g the BigQuery table on demand:
-
     This leverages BigQuery's power to perform analytics across terabytes of data in seconds, completely decoupling the query logic from the ingestion process.
 
 *   **The "Monitoring Path" (Job Status):**

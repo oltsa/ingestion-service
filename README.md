@@ -81,11 +81,9 @@ curl http://localhost:8080/top-senders
 ]
 ```
 
-### "Cloud-Native" Architecture (Conceptual Alternative)
+### "Cloud-Native" version of architecture 
 
 A more cloud-native approach would separate ingestion, storage, and analytics into independent responsibilities:
-
----
 
 **High-Throughput Data Ingestion**
 
@@ -94,13 +92,9 @@ Rather than a single long-running job, ingestion would be event-driven and distr
 1. A file upload to **Cloud Storage** triggers a **Cloud Run** job via **Pub/Sub**.
 2. That job parses the archive and streams raw, unaggregated records—one per valid email—into a high-throughput sink such as **BigQuery's Streaming API**.
 
----
-
 **On-Demand Analytics**
 
 Metrics endpoints like `GET /top-senders` would be served by a **separate service**, querying the raw data store (e.g. BigQuery) on demand. This decouples analytics from ingestion entirely, allowing for stateless, scalable query services.
-
----
 
 **Job Status**
 

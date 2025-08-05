@@ -81,7 +81,7 @@ curl http://localhost:8080/top-senders
 ]
 ```
 
-### "Cloud-Native" version of architecture 
+## "Cloud-Native" version of architecture 
 
 A more cloud-native approach would separate ingestion, storage, and analytics into independent responsibilities:
 
